@@ -3,8 +3,8 @@ import vue from '@vitejs/plugin-vue'
 import glsl from 'vite-plugin-glsl'
 import { templateCompilerOptions } from '@tresjs/core'
 
-// https://vitejs.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [
     vue({
       ...templateCompilerOptions,
@@ -12,10 +12,11 @@ export default defineConfig({
     glsl(),
   ],
   build: {
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: {
-          three: ['three'],
+        manualChunks(id: string) {
+          if (id.includes('node_modules/three/')) { return 'three' }
         },
       },
     },
