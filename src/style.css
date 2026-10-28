@@ -1,12 +1,246 @@
+:root {
+  --ink: #1d3461;
+  --muted: #6b7b98;
+  --line: #e3ebf6;
+  --line-strong: #cbd9ec;
+  --surface: #ffffff;
+  --accent: #2a62c9;
+  --accent-strong: #1f4fa8;
+  --accent-soft: #f0f5fc;
+  --production: #f2a516;
+  --consumption: #2a62c9;
+  --export: #1b9466;
+  --import: #d9534f;
+  --pill: #111a2e;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 12px 32px -14px rgba(29, 52, 97, 0.28);
+  color: var(--ink);
+  font:
+    14px/1.45 Inter,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 html,
 body {
   margin: 0;
-  padding: 0;
   height: 100%;
-  width: 100%;
+  overflow: hidden;
+  background: #cfe1f5;
 }
-#app {
-  height: 100%;
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.card {
+  padding: 18px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-head .icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--accent);
+}
+
+.card-head h2 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-head .meta {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.dot {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  margin-right: 7px;
+  border-radius: 3px;
+}
+
+.dot.production {
+  background: var(--production);
+}
+
+.dot.consumption {
+  background: var(--consumption);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+.round {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px -4px rgba(42, 98, 201, 0.6);
+}
+
+.round:hover {
+  background: var(--accent-strong);
+}
+
+input[type='date'] {
+  padding: 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 13px;
+}
+
+.slider {
+  --track: var(--line);
+  --fill-color: var(--accent);
   width: 100%;
-  background-color: #000;
+  height: 22px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--fill-color) var(--fill), var(--track) var(--fill));
+}
+
+.slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--fill-color) var(--fill), var(--track) var(--fill));
+}
+
+.slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(29, 52, 97, 0.25);
+  appearance: none;
+}
+
+.slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(29, 52, 97, 0.25);
+}
+
+.sun-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #d7e2f2 var(--rise),
+    #ffe6a3 var(--rise),
+    #ffe6a3 var(--set),
+    #d7e2f2 var(--set)
+  );
+}
+
+.sun-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #d7e2f2 var(--rise),
+    #ffe6a3 var(--rise),
+    #ffe6a3 var(--set),
+    #d7e2f2 var(--set)
+  );
+}
+
+.sun-slider::-webkit-slider-thumb {
+  width: 24px;
+  height: 24px;
+  margin-top: -8px;
+  border: 2.5px solid var(--ink);
+  background: #ffc83d;
+  box-shadow:
+    0 0 0 4px rgba(255, 200, 61, 0.3),
+    0 2px 6px rgba(29, 52, 97, 0.3);
+}
+
+.sun-slider::-moz-range-thumb {
+  width: 19px;
+  height: 19px;
+  border: 2.5px solid var(--ink);
+  background: #ffc83d;
+  box-shadow:
+    0 0 0 4px rgba(255, 200, 61, 0.3),
+    0 2px 6px rgba(29, 52, 97, 0.3);
+}
+
+@media (max-width: 1100px) {
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
 }
