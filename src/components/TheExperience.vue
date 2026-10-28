@@ -1,74 +1,100 @@
 <script setup lang="ts">
-import { OrbitControls } from '@tresjs/cientos'
-import { useLoop } from '@tresjs/core'
-import { ref } from 'vue'
-import type { Group } from 'three'
+import { useLoop, useTres } from '@tresjs/core'
+import { Vector3 } from 'three'
+import type { OrthographicCamera } from 'three'
+import { onMounted, onUnmounted, shallowRef, watch } from 'vue'
+import { useSolar } from '../composables/useSolar'
+import { orbitPosition, PLOT_SIZE, POLE_TOP, TREES, view } from '../lib/blueprint'
+import Compass from './Compass.vue'
+import Home from './Home.vue'
+import Plot from './Plot.vue'
+import Sky from './Sky.vue'
 
-const DAY_DURATION = 24
-const SUN_RADIUS = 7
-const sunRef = ref<Group | null>(null)
-let elapsed = 0
+const TARGET = new Vector3(0, 3, 0)
+const MARGIN = 2
+const GAP = 24
+const HALF = PLOT_SIZE / 2
+
+const EXTENTS = [
+  ...[-HALF, HALF].flatMap(x => [-HALF, HALF].flatMap(z => [new Vector3(x, 0, z), new Vector3(x, -0.6, z)])),
+  ...TREES.map(([x, z, size]) => new Vector3(x, 4.3 * size, z)),
+  POLE_TOP,
+  ...Array.from({ length: 33 }, (_, i) => orbitPosition(Math.PI * i / 32)),
+]
+
+const solar = useSolar()
+const { sizes, renderer } = useTres()
+const cameraRef = shallowRef<OrthographicCamera | null>(null)
+const point = new Vector3()
+let dirty = true
+
+function freeArea(canvas: DOMRect) {
+  const panel = document.querySelector('.hud .panel')?.getBoundingClientRect()
+  if (!panel || window.innerWidth <= 1100) {
+    return { left: GAP, top: GAP, width: canvas.width - GAP * 2, height: canvas.height - GAP * 2 }
+  }
+  return { left: GAP, top: GAP, width: panel.left - canvas.left - GAP * 2, height: canvas.height - GAP * 2 }
+}
+
+function fit(camera: OrthographicCamera) {
+  const canvas = renderer.domElement.getBoundingClientRect()
+  if (!canvas.width || !canvas.height) {
+    return
+  }
+  camera.lookAt(TARGET)
+  camera.updateMatrixWorld()
+  let minX = Infinity
+  let maxX = -Infinity
+  let minY = Infinity
+  let maxY = -Infinity
+  for (const p of EXTENTS) {
+    point.copy(p).applyMatrix4(camera.matrixWorldInverse)
+    minX = Math.min(minX, point.x - MARGIN)
+    maxX = Math.max(maxX, point.x + MARGIN)
+    minY = Math.min(minY, point.y - MARGIN)
+    maxY = Math.max(maxY, point.y + MARGIN)
+  }
+  const area = freeArea(canvas)
+  const scale = Math.min(area.width / (maxX - minX), area.height / (maxY - minY))
+  camera.left = (minX + maxX) / 2 - (area.left + area.width / 2) / scale
+  camera.right = camera.left + canvas.width / scale
+  camera.top = (minY + maxY) / 2 + (area.top + area.height / 2) / scale
+  camera.bottom = camera.top - canvas.height / scale
+  camera.updateProjectionMatrix()
+  view.left = camera.left + area.left / scale
+  view.right = camera.left + (area.left + area.width) / scale
+  view.top = camera.top - area.top / scale
+  dirty = false
+}
+
+function refit() {
+  dirty = true
+}
+
+watch([sizes.width, sizes.height], refit)
+onMounted(() => {
+  window.addEventListener('resize', refit)
+  document.fonts?.ready.then(refit)
+})
+onUnmounted(() => window.removeEventListener('resize', refit))
 
 const { onBeforeRender } = useLoop()
-onBeforeRender(({ delta }) => {
-  elapsed += delta
-  const progress = (elapsed % DAY_DURATION) / DAY_DURATION
-  const angle = progress * 2 * Math.PI
-  sunRef.value?.position.set(Math.cos(angle) * SUN_RADIUS, Math.sin(angle) * SUN_RADIUS, -3)
+onBeforeRender(() => {
+  if (dirty && cameraRef.value) {
+    fit(cameraRef.value)
+  }
 })
+
+const daylight = () => Math.min(1, Math.max(0, solar.now.value.sun.altitude * 180 / Math.PI / 8 + 0.4))
 </script>
 
 <template>
-  <TresPerspectiveCamera :position="[5, 5, 5]" :look-at="[0, 0, 0]" />
-  <OrbitControls />
+  <TresOrthographicCamera ref="cameraRef" :position="[40, 44, 40]" :near="-200" :far="400" />
 
-  <TresAmbientLight :intensity="0.5" color="white" />
+  <TresHemisphereLight :intensity="0.55 + 1.95 * daylight()" color="#f2f7ff" ground-color="#9fbbe0" />
 
-  <TresMesh :position="[0, 0, 0]" :rotation="[-Math.PI / 2, 0, 0]">
-    <TresPlaneGeometry :args="[10, 10]" />
-    <TresMeshStandardMaterial color="gray" />
-  </TresMesh>
-
-  <TresMesh :position="[0, 0.7, 0]">
-    <TresBoxGeometry :args="[2, 1.4, 2]" />
-    <TresMeshStandardMaterial color="lightblue" />
-  </TresMesh>
-
-  <TresGroup :position="[0, 1.666, 0]" :scale="[1, 0.4, 1]">
-    <TresMesh :rotation="[-Math.PI / 2, 0, 0]">
-      <TresCylinderGeometry :args="[1.328, 1.328, 2.2, 3]" />
-      <TresMeshStandardMaterial color="firebrick" />
-    </TresMesh>
-  </TresGroup>
-
-  <TresMesh :position="[0.592, 1.824, -0.5]" :rotation="[0, 0, -0.605]">
-    <TresBoxGeometry :args="[0.9, 0.04, 0.9]" />
-    <TresMeshStandardMaterial color="#1a2a5c" />
-  </TresMesh>
-  <TresMesh :position="[0.592, 1.824, 0.5]" :rotation="[0, 0, -0.605]">
-    <TresBoxGeometry :args="[0.9, 0.04, 0.9]" />
-    <TresMeshStandardMaterial color="#1a2a5c" />
-  </TresMesh>
-
-  <TresGroup ref="sunRef" :position="[SUN_RADIUS, 0, -3]">
-    <TresMesh>
-      <TresSphereGeometry :args="[0.5, 32, 32]" />
-      <TresMeshBasicMaterial color="gold" />
-    </TresMesh>
-    <TresPointLight :intensity="80" color="#fff2cc" />
-  </TresGroup>
-
-  <TresMesh :position="[2.5, 1.25, 2]">
-    <TresCylinderGeometry :args="[0.05, 0.07, 2.5, 12]" />
-    <TresMeshStandardMaterial color="#333333" />
-  </TresMesh>
-  <TresMesh :position="[2.5, 2.6, 2]">
-    <TresSphereGeometry :args="[0.18, 24, 24]" />
-    <TresMeshBasicMaterial color="#ffe9a8" />
-  </TresMesh>
-  <TresPointLight :position="[2.5, 2.6, 2]" :intensity="8" color="#ffd98a" />
-
-  <TresDirectionalLight :position="[0, 2, 4]" :intensity="1" cast-shadow />
-
-  <TresAxesHelper />
+  <Plot />
+  <Compass />
+  <Sky />
+  <Home />
 </template>

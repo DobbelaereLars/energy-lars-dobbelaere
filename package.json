@@ -14,6 +14,7 @@
   "dependencies": {
     "@tresjs/cientos": "latest",
     "@tresjs/core": "latest",
+    "suncalc": "^2.1.1",
     "three": "latest",
     "three-stdlib": "latest",
     "vue": "latest"
