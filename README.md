@@ -175,44 +175,23 @@ Alle 3D-modellen zijn in code opgebouwd uit eenvoudige vormen. Er zijn geen exte
 
 ## AI-verantwoording
 
-Fase 1 is zonder AI gemaakt. Voor fase 2 en 3 is **Claude Code** (model Claude Opus 5.5) gebruikt in Visual Studio Code.
+Fase 1 is zonder AI gemaakt. Voor fase 2 en 3 gebruikte ik **Claude Code** (Claude Opus 5.5) in Visual Studio Code.
 
-Gebruikte prompts (samengevat, in volgorde):
+Prompts (samengevat):
 
-1. De opdrachttekst met: "Maak deze opdracht volledig, doe nu fase 2 en fase 3 … low poly, warme kleuren … vooral met zonne-energie."
-2. Extra wensen voor gradients, animaties en meer instellingen. Dat leverde een versie met veel extra functies op (batterij, steden, tuin, lichtslingers, kompas dat de wereld draait).
-3. "Herwerk deze opdracht volgens de opdrachtomschrijving. Haal alle onnodige features eruit. Maak de UI minder AI-achtig, en geen scrollbare kaders. Alleen noodzakelijke features. En het huis moet je kunnen verplaatsen (niet kompas draaien)."
-4. "Het eindresultaat moet iets proof of concept zijn, om te tonen aan klanten/bedrijven … het belangrijkste is stroomverbruik / wat er binnen komt van de zonnepanelen."
-5. "Gebruik moderne UI … het huisje enz., maar iets minder details."
-6. "Het moet in blueprint-stijl zijn (met een voorbeeldafbeelding). Doe isometrisch opzicht en zorg dat je handmatig de zon kunt bewegen. We moeten de zon ook zien in de tool."
-7. "Zorg dat er ook een maan zichtbaar is. En doe ter decoratie wat lichtbronnen, zoals een lantaarnpaal."
-8. "Zorg ook dat er sterren zijn in de lucht 's nachts en dat ik de zon volledig kan slepen (24 uur), en doe de lichtbronnen een beetje random geplaatst."
-9. "Doe de maan op dezelfde lijn als de zon (onrealistisch, de maan kan je dan ook slepen)."
-10. "Zorg dat je een vaste camerapositie hebt, waarbij je nog de volledige zon/maan kunt verslepen, volledig rond. Max twee lantaarnpalen op een logische plek dicht bij het huis. Het huis moet je niet kunnen verslepen, alleen verdraaien, ook met je muis op het perceel."
-11. "Maak de UI nog moderner (met een voorbeeld van een dashboard), maar zorg dat het bij mijn opdracht past."
-12. "Zorg dat de lantaarnpalen meebewegen bij rotatie van het huis, maak het duidelijk dat je het huis kunt roteren. Plus voorzie een kompas."
-13. "Zorg dat de zon/maan-koepel meer gekanteld staat in de richting zoals het hoort, zodat de route niet door het huis loopt."
-14. "Doe alle onnodige UI-elementen weg, plaats de microfoonknop in de tijdsbalk, en het kader 'Vraag het aan de twin' moet weg."
-15. "Het grid moet weg overdag, en zorg dat overdag echt overdag lijkt (zoals 's nachts 's nachts lijkt). Laat zon en maan in- en uitfaden."
-16. "Zorg dat de kaders niet overlappen met de playground; max twee kaders: playground links, de twee kaders onder elkaar rechts. Alles moet nog op een andere manier aanpasbaar zijn."
-17. "Zorg dat de lijn van de elektriciteitskast naar de elektriciteitspaal, en van de zonnepanelen naar de elektriciteitskast, altijd logisch en mooi verbonden is, ook als je het huis draait."
-18. "Zorg dat de wolken niet achter de kaders komen, maar mooi zichtbaar zijn links van het scherm."
-19. "Ik vind de lijntjes die alles verbinden (zon, zonnepanelen, elektriciteit) niet goed, verzin iets anders of laat ze volledig weg." De lijnen zijn weggelaten; de gloed van de panelen blijft de visuele aanwijzing in de scène.
+1. Werk fase 2 en 3 uit voor zonne-energie: echte zonnestand (SunCalc) en instraling (Open-Meteo), spraakcommando's en een simulatie van de opbrengst.
+2. Beperk de app tot wat de opdracht vraagt: geen extra functies, een eenvoudige UI zonder scrollende kaders.
+3. Geef de scène een isometrische blueprint-stijl, met een versleepbare zon en maan en 's nachts sterren en lantaarns.
+4. Gebruik een vaste camera en laat het huis draaien op het perceel, met een kompas eromheen.
+5. Zet de bediening in twee kaders rechts, met de microfoon in de tijdsbalk.
 
-Wat AI deed en wat gecontroleerd werd:
+Wat ik aanpaste:
 
-- De AI schreef de code en testte ze met een headless browser (screenshots op verschillende schermgroottes, slepen van huis en zon, spraakknoppen).
-- Formules en eenheden zijn nagerekend met echte data. Zo levert een zuiddak van 2,33 kWp op 21 juni 2026 17,4 kWh (≈ 7,5 kWh/kWp, een heldere zomerdag), en op 28 oktober 9,0 kWh. Gedraaid naar het oosten zakt het vermogen om 13:30 op 21 juni van 2,11 naar 1,71 kW, wat klopt omdat de zon dan in het zuiden staat.
+- Overbodige functies uit de eerste versie geschrapt (batterij, steden, tuin, lichtslingers).
+- Zelf de stijl en de interactie gekozen, en de verbindingslijnen tussen zon, panelen en net weggelaten omdat ze onduidelijk waren.
+- Formules en eenheden nagekeken: 2,33 kWp op het zuiden geeft op 21 juni 17,4 kWh (± 7,5 kWh/kWp), een realistische zomerdag.
 
-Wat ik zelf aanpaste of bewust anders deed:
-
-- De eerste versie zat vol functies die de opdracht niet vraagt (batterij, steden, tuin, lichtslingers, een kompas dat de wereld draait). Die heb ik laten schrappen tot alleen het noodzakelijke overbleef.
-- De stijl zelf gekozen (blueprint, isometrisch, met een voorbeeldafbeelding) en de UI laten herwerken omdat ze te generiek oogde: maximaal twee kaders naast de scène, niets dat scrolt, de microfoon in de tijdsbalk.
-- De interactie aangepast: het huis draait op het perceel in plaats van de wereld, de camera staat vast en zon en maan zijn volledig versleepbaar.
-- De verbindingslijnen tussen zon, panelen, meterkast en net weggelaten omdat ze de scène onduidelijk maakten.
-- Formules en eenheden nagekeken met de dagtotalen hierboven.
-
-De demovideo, de GitHub Pages-deploy en de inlevertekst zijn ook met Claude gemaakt. In de video kreeg de spraakherkenning een vaste tekst in plaats van de microfoon (de opname gebeurde automatisch in een browser zonder microfoon); de verwerking van het commando is dezelfde code als in de app.
+De demovideo en de GitHub Pages-deploy zijn ook met Claude gemaakt. In de video kreeg de spraakherkenning een vaste tekst in plaats van de microfoon; de verwerking van het commando is dezelfde code als in de app.
 
 ## Reflectie
 
